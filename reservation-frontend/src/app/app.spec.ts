@@ -1,22 +1,22 @@
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { App } from './app';
-import { ReservationApiService } from './reservation-api.service';
+import { ReservationService } from './reservation.service';
 
 describe('App', () => {
-  let reservationApiSpy: jasmine.SpyObj<ReservationApiService>;
+  let reservationServiceSpy: jasmine.SpyObj<ReservationService>;
 
   beforeEach(async () => {
-    reservationApiSpy = jasmine.createSpyObj<ReservationApiService>('ReservationApiService', [
-      'listReservations',
+    reservationServiceSpy = jasmine.createSpyObj<ReservationService>('ReservationService', [
+      'getReservations',
       'createReservation',
       'cancelReservation'
     ]);
-    reservationApiSpy.listReservations.and.returnValue(of([]));
+    reservationServiceSpy.getReservations.and.returnValue(of([]));
 
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [{ provide: ReservationApiService, useValue: reservationApiSpy }]
+      providers: [{ provide: ReservationService, useValue: reservationServiceSpy }]
     }).compileComponents();
   });
 
@@ -26,10 +26,10 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render the reservation heading', () => {
+  it('should render the reservations table heading', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Reservas');
+    expect(compiled.querySelector('h1')?.textContent?.toLowerCase()).toContain('reservas');
   });
 });

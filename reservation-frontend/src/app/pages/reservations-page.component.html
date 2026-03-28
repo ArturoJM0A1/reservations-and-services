@@ -1,0 +1,91 @@
+<main class="page-shell">
+  <section class="page-header panel">
+    <div class="page-header__copy">
+      <p class="eyebrow">Panel de reservas</p>
+      <h1>Reservas registradas</h1>
+      <p class="page-header__text">
+        Consulta la agenda completa y cancela reservas desde una sola tabla.
+      </p>
+    </div>
+
+    <div class="page-header__actions">
+      <button class="ghost-button" type="button" (click)="refreshReservations()">
+        Actualizar
+      </button>
+    </div>
+  </section>
+
+  @if (feedback(); as message) {
+    <section class="feedback-banner" [class.feedback-banner--error]="feedbackTone() === 'error'">
+      {{ message }}
+    </section>
+  }
+
+  <section class="panel table-panel">
+    @if (loading()) {
+      <div class="empty-state">
+        <p class="empty-state__title">Cargando reservas...</p>
+        <p class="empty-state__copy">Obteniendo informacion desde el backend.</p>
+      </div>
+    } @else if (reservations().length === 0) {
+      <div class="empty-state">
+        <p class="empty-state__title">No hay reservas disponibles</p>
+        <p class="empty-state__copy">Cuando existan registros apareceran en esta tabla.</p>
+      </div>
+    } @else {
+      <div class="table-shell">
+        <table class="reservations-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Cliente</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Servicio</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (
+              reservation of reservations();
+              track trackByReservationId($index, reservation)
+            ) {
+              <tr [class.reservations-table__row--cancelled]="isCancelled(reservation.status)">
+                <td>#{{ reservation.id }}</td>
+                <td>{{ reservation.customerName }}</td>
+                <td>{{ reservation.date | date: 'dd/MM/yyyy' }}</td>
+                <td>{{ reservation.time | slice: 0 : 5 }}</td>
+                <td>{{ reservation.service }}</td>
+                <td>
+                  <span
+                    class="status-pill"
+                    [class.status-pill--cancelled]="isCancelled(reservation.status)"
+                  >
+                    {{ reservation.status }}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    class="danger-button"
+                    type="button"
+                    [disabled]="isCancelled(reservation.status) || cancellingId() === reservation.id"
+                    (click)="cancelReservation(reservation)"
+                  >
+                    @if (cancellingId() === reservation.id) {
+                      Cancelando...
+                    } @else if (isCancelled(reservation.status)) {
+                      Cancelada
+                    } @else {
+                      Cancelar
+                    }
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</main>

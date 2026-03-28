@@ -1,146 +1,17 @@
-# Reservation Backend
+# Sistema De Reservas + IA
 
-API REST para la gestion de reservas del proyecto del grupo `com.dev.arturojm`.
+Monorepo con dos aplicaciones principales:
 
-Este backend permite:
+- `reservation-backend`: API REST construida con Spring Boot
+- `reservation-frontend`: cliente Angular
 
-- registrar nuevas reservas
-- consultar las reservas almacenadas
-- cancelar una reserva existente
+El proyecto permite consultar reservas, crear nuevas reservas desde servicio HTTP y cancelar reservas existentes. En el estado actual del frontend, la vista principal muestra una tabla con las reservas y permite cancelarlas; el servicio Angular ya expone tambien el metodo para crear reservas, listo para futuras pantallas o formularios.
 
-## Stack tecnologico
+## Arquitectura General
 
-- Java 25
-- Spring Boot 4.0.4
-- Spring Web MVC
-- Spring Data JPA
-- PostgreSQL
-- Maven
-- H2 para pruebas automatizadas
+### Backend
 
-## Requisitos previos
-
-Antes de ejecutar el proyecto, asegurate de tener:
-
-- Java 25 instalado
-- PostgreSQL en ejecucion
-- una base de datos creada con el nombre `g3reservation`
-
-## Configuracion
-
-La aplicacion puede ejecutarse con estas variables de entorno:
-
-```properties
-DB_URL=jdbc:postgresql://localhost:5432/g3reservation
-DB_USERNAME=postgres
-DB_PASSWORD=arturo1
-```
-
-Si no defines estas variables, el proyecto usa esos valores por defecto.
-
-El servidor corre en el puerto:
-
-```properties
-server.port=8081
-```
-
-## Como ejecutar el proyecto
-
-Desde la raiz del proyecto, en Windows:
-
-```bash
-mvnw.cmd spring-boot:run
-```
-
-Si tienes Maven instalado de forma global, tambien puedes usar:
-
-```bash
-mvn spring-boot:run
-```
-
-Una vez iniciado, la API queda disponible en:
-
-```text
-http://localhost:8081
-```
-
-## Como ejecutar las pruebas
-
-```bash
-mvnw.cmd test
-```
-
-Las pruebas usan H2 en memoria, por lo que no dependen de tu base de datos PostgreSQL local.
-
-## Endpoints disponibles
-
-### GET /reservas
-
-Obtiene todas las reservas registradas.
-
-Respuestas posibles:
-
-- `200 OK` si existen reservas
-- `404 Not Found` si la base de datos esta vacia
-
-Ejemplo de error:
-
-```json
-{
-  "message": "No hay reservas registradas en la base de datos."
-}
-```
-
-### POST /reservas
-
-Crea una nueva reserva.
-
-Consideraciones:
-
-- el `id` se genera automaticamente
-- el estado final se establece en `PENDING`, aunque el cliente envie otro valor
-
-Ejemplo de cuerpo:
-
-```json
-{
-  "customerName": "Ana Perez",
-  "date": "2026-03-25",
-  "time": "14:30:00",
-  "service": "Corte de cabello",
-  "status": "CONFIRMED"
-}
-```
-
-Respuesta:
-
-- `201 Created` si la reserva se registra correctamente
-
-### DELETE /reservas/{id}
-
-Cancela una reserva existente a partir de su identificador.
-
-Consideraciones:
-
-- no elimina fisicamente el registro
-- cambia el estado de la reserva a `CANCELLED`
-
-Respuestas posibles:
-
-- `204 No Content` si la reserva fue cancelada
-- `404 Not Found` si no existe una reserva con el `id` indicado
-
-Ejemplo de error:
-
-```json
-{
-  "message": "No existe una reserva con id 999."
-}
-```
-
-## Modelo principal
-
-La entidad `Reservation` contiene los siguientes campos:
+El backend expone la API REST en Spring Boot y persiste la informacion en PostgreSQL. La entidad principal es `Reservation`, con estos campos:
 
 - `id`
 - `customerName`
@@ -155,19 +26,349 @@ Estados disponibles:
 - `CONFIRMED`
 - `CANCELLED`
 
-## Estructura del proyecto
+### Frontend
+
+El frontend esta hecho en Angular y consume la API por medio de `HttpClient`. La integracion principal vive en:
+
+- `reservation-frontend/src/app/reservation.service.ts`
+- `reservation-frontend/src/app/pages/reservations-page.component.ts`
+
+La URL del backend se configura con archivos de entorno:
+
+- `reservation-frontend/src/environments/environment.ts`
+- `reservation-frontend/src/environments/environment.prod.ts`
+
+## Estructura Del Repositorio
+
+Las carpetas activas del proyecto son:
 
 ```text
-src/main/java/com/dev/arturojm/reservation
-|-- controller
-|-- entity
-|-- exception
-|-- repository
-`-- service
+reservation-backend/
+  .mvn/
+  src/
+  pom.xml
+  mvnw
+  mvnw.cmd
+
+reservation-frontend/
+  src/
+  angular.json
+  package.json
+  tsconfig.json
+
+README.md
 ```
 
-## Notas
+La raiz puede contener carpetas auxiliares, temporales o heredadas de iteraciones anteriores. Para trabajar en el proyecto, toma como referencia principal `reservation-backend/` y `reservation-frontend/`.
 
-- La API expone documentacion Swagger cuando la aplicacion esta en ejecucion.
-- La cancelacion de reservas se maneja como una actualizacion de estado, no como borrado fisico.
-- El proyecto incluye reglas de negocio para evitar respuestas vacias sin contexto.
+## Stack Tecnologico
+
+### Backend
+
+- Java 25
+- Spring Boot 4.0.4
+- Spring Web MVC
+- Spring Data JPA
+- PostgreSQL
+- Maven Wrapper
+- H2 para pruebas
+
+### Frontend
+
+- Angular 20
+- TypeScript
+- RxJS
+- Angular HttpClient
+
+## Requisitos Previos
+
+Antes de ejecutar el proyecto, asegurate de tener:
+
+- Java 25 instalado
+- PostgreSQL corriendo localmente
+- una base de datos creada, por ejemplo `g3reservation`
+- Node.js instalado
+- npm disponible
+
+En esta maquina se ha usado correctamente:
+
+- `JAVA_HOME=D:\Program Files\Eclipse Adoptium\jdk-25.0.2.10-hotspot`
+- `D:\Program Files\nodejs\npm.cmd`
+
+## Configuracion Del Backend
+
+El backend usa estas propiedades por defecto en `reservation-backend/src/main/resources/application.properties`:
+
+```properties
+spring.datasource.url=${DB_URL:jdbc:postgresql://localhost:5432/g3reservation}
+spring.datasource.username=${DB_USERNAME:postgres}
+spring.datasource.password=${DB_PASSWORD:arturo1}
+server.port=8081
+```
+
+Eso significa:
+
+- si defines `DB_URL`, `DB_USERNAME` y `DB_PASSWORD`, se usan tus valores
+- si no defines nada, el backend intentara conectarse a PostgreSQL local con esos valores por defecto
+- la API escucha en `http://localhost:8081`
+
+Ademas, el backend ya incluye configuracion CORS para aceptar peticiones desde:
+
+```text
+http://localhost:4200
+```
+
+La clase responsable es `reservation-backend/src/main/java/com/dev/arturojm/reservation/config/CorsConfiguration.java`.
+
+## Configuracion Del Frontend
+
+La URL base de la API no esta escrita directamente en los componentes. Se centraliza en:
+
+```ts
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:8081'
+};
+```
+
+El servicio Angular `ReservationService` construye sus endpoints a partir de `environment.apiUrl`.
+
+## Como Ejecutar El Proyecto Desde CMD
+
+### 1. Levantar el backend
+
+Abre una ventana de `cmd` y ejecuta:
+
+```cmd
+cd /d "D:\Archivos AJM\Arturo DEV\Proyecto Full Stack Sistema de reservas + IA\reservation-backend arturojm\reservation-backend"
+set JAVA_HOME=D:\Program Files\Eclipse Adoptium\jdk-25.0.2.10-hotspot
+mvnw.cmd spring-boot:run
+```
+
+Si la aplicacion arranca correctamente, la API quedara disponible en:
+
+```text
+http://localhost:8081
+```
+
+### 2. Levantar el frontend
+
+Abre otra ventana de `cmd` y ejecuta:
+
+```cmd
+cd /d "D:\Archivos AJM\Arturo DEV\Proyecto Full Stack Sistema de reservas + IA\reservation-backend arturojm\reservation-frontend"
+"D:\Program Files\nodejs\npm.cmd" install
+"D:\Program Files\nodejs\npm.cmd" start
+```
+
+Si `npm` ya esta bien configurado en tu PATH, tambien puedes usar:
+
+```cmd
+npm install
+npm start
+```
+
+La aplicacion Angular quedara disponible en:
+
+```text
+http://localhost:4200
+```
+
+## URLs Importantes
+
+### Frontend
+
+```text
+http://localhost:4200
+```
+
+### Backend
+
+```text
+http://localhost:8081
+```
+
+### Endpoint principal de reservas
+
+```text
+http://localhost:8081/reservas
+```
+
+## Endpoints De La API
+
+### GET /reservas
+
+Lista todas las reservas.
+
+Respuesta esperada:
+
+- `200 OK`
+
+Ejemplo:
+
+```json
+[
+  {
+    "id": 1,
+    "customerName": "Ana Perez",
+    "date": "2026-03-25",
+    "time": "14:30:00",
+    "service": "Corte premium",
+    "status": "PENDING"
+  }
+]
+```
+
+Si no existen reservas, actualmente la API devuelve una lista vacia con `200 OK`.
+
+### POST /reservas
+
+Crea una reserva nueva.
+
+Consideraciones:
+
+- el `id` se ignora y se genera en backend
+- el estado final siempre se establece como `PENDING`
+
+Ejemplo de request:
+
+```json
+{
+  "customerName": "Luis Gomez",
+  "date": "2026-04-02",
+  "time": "10:00:00",
+  "service": "Manicure express"
+}
+```
+
+Respuesta esperada:
+
+- `201 Created`
+
+### DELETE /reservas/{id}
+
+Cancela una reserva existente.
+
+Consideraciones:
+
+- no elimina fisicamente el registro
+- cambia el estado a `CANCELLED`
+
+Respuesta esperada:
+
+- `204 No Content`
+
+Si no existe la reserva:
+
+- `404 Not Found`
+
+Ejemplo de error:
+
+```json
+{
+  "message": "No existe una reserva con id 999."
+}
+```
+
+## Frontend: Componentes Y Flujo Actual
+
+La vista principal del frontend es una pagina dedicada que muestra una tabla de reservas:
+
+- `reservation-frontend/src/app/pages/reservations-page.component.ts`
+- `reservation-frontend/src/app/pages/reservations-page.component.html`
+
+Este componente:
+
+- obtiene las reservas desde `ReservationService`
+- las muestra en una tabla
+- permite cancelar una reserva con un boton
+- muestra mensajes de exito y error
+
+## ReservationService En Angular
+
+El servicio principal es `reservation-frontend/src/app/reservation.service.ts`.
+
+Expone estos metodos:
+
+- `getReservations()`
+- `createReservation(payload)`
+- `cancelReservation(id)`
+
+Aunque la pagina actual esta enfocada en tabla + cancelacion, el metodo `createReservation()` ya esta listo para conectarse a futuros formularios o nuevas pantallas.
+
+## Comandos Utiles
+
+### Backend
+
+Ejecutar la aplicacion:
+
+```cmd
+mvnw.cmd spring-boot:run
+```
+
+Ejecutar pruebas:
+
+```cmd
+mvnw.cmd test
+```
+
+### Frontend
+
+Levantar en desarrollo:
+
+```cmd
+"D:\Program Files\nodejs\npm.cmd" start
+```
+
+Compilar:
+
+```cmd
+"D:\Program Files\nodejs\npm.cmd" run build
+```
+
+Ejecutar pruebas:
+
+```cmd
+"D:\Program Files\nodejs\npm.cmd" test
+```
+
+## Verificaciones Realizadas
+
+Durante la configuracion actual del proyecto ya se verifico que:
+
+- `mvn test` en `reservation-backend` pasa correctamente
+- `npm run build` en `reservation-frontend` compila correctamente
+
+## Solucion De Problemas
+
+### Error: Not Found
+
+Revisa que:
+
+- el backend este corriendo en `http://localhost:8081`
+- estes consultando `http://localhost:8081/reservas` y no solo la raiz `/`
+- el frontend este apuntando a `environment.apiUrl = 'http://localhost:8081'`
+
+### Error: No se pudo conectar con la base de datos
+
+Revisa que:
+
+- PostgreSQL este corriendo
+- la base de datos exista
+- `DB_URL`, `DB_USERNAME` y `DB_PASSWORD` sean correctos
+
+### Error: El frontend no conecta con el backend
+
+Revisa que:
+
+- Angular este corriendo en `http://localhost:4200`
+- Spring Boot este corriendo en `http://localhost:8081`
+- no hayas cambiado la URL en los archivos `environment`
+- el backend no haya fallado al iniciar por conexion a PostgreSQL
+
+## Notas Finales
+
+- el backend expone documentacion Swagger cuando la aplicacion esta corriendo
+- la cancelacion de reservas es logica, no fisica
+- el README principal de referencia es este archivo
+- si necesitas documentacion mas breve por modulo, revisa tambien los README dentro de cada aplicacion
