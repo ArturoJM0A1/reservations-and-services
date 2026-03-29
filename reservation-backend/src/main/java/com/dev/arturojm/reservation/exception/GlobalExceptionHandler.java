@@ -8,6 +8,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+	@ExceptionHandler(ReservationConflictException.class)
+	public ResponseEntity<ApiErrorResponse> handleReservationConflictException(
+			ReservationConflictException exception) {
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+				.body(new ApiErrorResponse(exception.getMessage()));
+	}
+
 	@ExceptionHandler(BusinessRuleException.class)
 	public ResponseEntity<ApiErrorResponse> handleBusinessRuleException(BusinessRuleException exception) {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)

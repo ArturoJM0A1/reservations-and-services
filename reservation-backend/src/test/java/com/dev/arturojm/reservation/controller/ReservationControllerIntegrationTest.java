@@ -82,6 +82,39 @@ class ReservationControllerIntegrationTest {
 	}
 
 	@Test
+	void postReservationsReturnsConflictWhenCustomerAlreadyHasReservationAtSameDateAndTime() throws Exception {
+		Reservation existingReservation = new Reservation(null, "Luis Gomez", LocalDate.of(2026, 4, 2),
+				LocalTime.of(10, 0), "Diagnostico", ReservationStatus.PENDING);
+		reservationRepository.save(existingReservation);
+
+		Reservation newReservation = new Reservation(null, "Luis Gomez", LocalDate.of(2026, 4, 2),
+				LocalTime.of(10, 0), "Manicure", ReservationStatus.CONFIRMED);
+
+		mockMvc.perform(post("/reservas")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(newReservation)))
+				.andExpect(status().isConflict())
+				.andExpect(jsonPath("$.message").value("Ya tienes una reserevacion a esa hora"));
+	}
+
+	@Test
+	void postReservationsCreatesReservationWhenPreviousOneAtSameDateAndTimeIsCancelled() throws Exception {
+		Reservation cancelledReservation = new Reservation(null, "Luis Gomez", LocalDate.of(2026, 4, 2),
+				LocalTime.of(10, 0), "Diagnostico", ReservationStatus.CANCELLED);
+		reservationRepository.save(cancelledReservation);
+
+		Reservation newReservation = new Reservation(null, "Luis Gomez", LocalDate.of(2026, 4, 2),
+				LocalTime.of(10, 0), "Manicure", ReservationStatus.CONFIRMED);
+
+		mockMvc.perform(post("/reservas")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(newReservation)))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.customerName").value("Luis Gomez"))
+				.andExpect(jsonPath("$.status").value("PENDING"));
+	}
+
+	@Test
 	void deleteReservationsCancelsAnExistingReservation() throws Exception {
 		Reservation reservation = new Reservation(null, "Maria Lopez", LocalDate.of(2026, 5, 10),
 				LocalTime.of(16, 15), "Masaje", ReservationStatus.CONFIRMED);

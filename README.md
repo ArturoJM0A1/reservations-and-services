@@ -1,4 +1,12 @@
-# Sistema De Reservas
+# Reservations and Services
+
+<p align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/7/79/Spring_Boot.svg" alt="Spring Boot" width="56"/>
+  <img src="https://upload.wikimedia.org/wikipedia/en/3/30/Java_programming_language_logo.svg" alt="Java" width="56"/>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/2/29/Postgresql_elephant.svg" alt="PostgreSQL" width="56"/>
+  <img src="https://angular.io/assets/images/logos/angular/angular.svg" alt="Angular" width="56"/>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/f/f5/Typescript.svg" alt="TypeScript" width="56"/>
+</p>
 
 Monorepo con dos aplicaciones principales:
 
@@ -140,9 +148,7 @@ El servicio Angular `ReservationService` construye sus endpoints a partir de `en
 Abre una ventana de `cmd` y ejecuta:
 
 ```cmd
-cd /d "D:\Archivos AJM\Arturo DEV\Proyecto Full Stack Sistema de reservas + IA\reservation-backend arturojm\reservation-backend"
-set JAVA_HOME=D:\Program Files\Eclipse Adoptium\jdk-25.0.2.10-hotspot
-mvnw.cmd spring-boot:run
+./mvnw spring-boot:run
 ```
 
 Si la aplicacion arranca correctamente, la API quedara disponible en:
@@ -154,12 +160,6 @@ http://localhost:8081
 ### 2. Levantar el frontend
 
 Abre otra ventana de `cmd` y ejecuta:
-
-```cmd
-cd /d "D:\Archivos AJM\Arturo DEV\Proyecto Full Stack Sistema de reservas + IA\reservation-backend arturojm\reservation-frontend"
-"D:\Program Files\nodejs\npm.cmd" install
-"D:\Program Files\nodejs\npm.cmd" start
-```
 
 Si `npm` ya esta bien configurado en tu PATH, tambien puedes usar:
 
