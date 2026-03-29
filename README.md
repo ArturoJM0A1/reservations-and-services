@@ -1,4 +1,4 @@
-# Sistema De Reservas + IA
+# Sistema De Reservas
 
 Monorepo con dos aplicaciones principales:
 
