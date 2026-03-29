@@ -402,6 +402,12 @@ h2 {
   text-transform: uppercase;
 }
 
+.status-pill--confirmed {
+  border-color: rgba(117, 255, 173, 0.28);
+  background: rgba(66, 201, 117, 0.16);
+  color: #b9ffd2;
+}
+
 .status-pill--cancelled {
   border-color: rgba(203, 221, 255, 0.12);
   background: rgba(203, 221, 255, 0.08);

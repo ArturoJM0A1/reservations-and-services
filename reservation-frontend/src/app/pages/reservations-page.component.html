@@ -173,6 +173,7 @@
                   <td>
                     <span
                       class="status-pill"
+                      [class.status-pill--confirmed]="reservation.status === 'CONFIRMED'"
                       [class.status-pill--cancelled]="isCancelled(reservation.status)"
                     >
                       {{ reservation.status }}

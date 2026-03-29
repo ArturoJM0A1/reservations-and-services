@@ -16,6 +16,10 @@ interface ServiceOption {
   recommended?: boolean;
 }
 
+const MAX_DAILY_RESERVATIONS_PER_CUSTOMER = 4;
+const DAILY_RESERVATION_LIMIT_MESSAGE =
+  'No se permiten mas de 4 reservaciones activas del mismo cliente el mismo dia.';
+
 @Component({
   selector: 'app-reservations-page',
   imports: [CommonModule, DatePipe, ReactiveFormsModule, SlicePipe, ToastMessageComponent],
@@ -85,7 +89,6 @@ export class ReservationsPageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.submitting.set(true);
     this.clearFeedback();
     this.dismissSaveErrorToast();
 
@@ -96,6 +99,13 @@ export class ReservationsPageComponent implements OnInit, OnDestroy {
       time: this.normalizeTime(formValue.hora),
       service: formValue.servicio
     };
+
+    if (this.hasReachedDailyReservationLimit(payload)) {
+      this.setFeedback(DAILY_RESERVATION_LIMIT_MESSAGE, 'error');
+      return;
+    }
+
+    this.submitting.set(true);
 
     this.reservationService
       .createReservation(payload)
@@ -275,6 +285,18 @@ export class ReservationsPageComponent implements OnInit, OnDestroy {
 
   private normalizeTime(time: string): string {
     return time.length === 5 ? `${time}:00` : time;
+  }
+
+  private hasReachedDailyReservationLimit(payload: CreateReservationRequest): boolean {
+    const normalizedCustomerName = payload.customerName.trim().toLowerCase();
+    const activeReservationsForSameDay = this.reservations().filter(
+      (reservation) =>
+        reservation.status !== 'CANCELLED' &&
+        reservation.date === payload.date &&
+        reservation.customerName.trim().toLowerCase() === normalizedCustomerName
+    );
+
+    return activeReservationsForSameDay.length >= MAX_DAILY_RESERVATIONS_PER_CUSTOMER;
   }
 
   private getMinimumDate(): string {
