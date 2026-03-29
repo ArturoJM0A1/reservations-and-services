@@ -16,7 +16,6 @@
 }
 
 .page-shell {
-  max-width: 1240px;
   margin: 0 auto;
   padding: clamp(1rem, 2.8vw, 2.75rem);
   display: grid;
@@ -63,6 +62,10 @@
   z-index: 1;
 }
 
+.table-panel{
+  width: 100%;
+}
+
 .eyebrow {
   margin: 0 0 0.7rem;
   font-size: 0.75rem;
@@ -70,6 +73,8 @@
   text-transform: uppercase;
   color: var(--accent);
 }
+
+
 
 h1 {
   margin: 0;
@@ -112,12 +117,12 @@ h2 {
 
 .composer-panel,
 .table-panel {
-  padding: 1.25rem;
+  padding: 1.3rem;
 }
 
 .composer-panel {
   display: grid;
-  gap: 1.35rem;
+  gap: 1rem;
 }
 
 .composer-panel__text,

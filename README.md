@@ -15,6 +15,20 @@ Monorepo con dos aplicaciones principales:
 
 El proyecto permite consultar reservas, crear nuevas reservas desde servicio HTTP y cancelar reservas existentes. En el estado actual del frontend, la vista principal incluye un formulario reactivo para registrar reservas nuevas, una tabla con la agenda actual y la opcion de cancelar reservas existentes.
 
+## Reglas De Negocio De Reservas
+
+- un mismo cliente debe esperar al menos 4 horas entre una reserva activa y la siguiente
+- un mismo cliente no puede tener mas de 4 reservaciones activas el mismo dia
+- la validacion aplica para todos los clientes
+- las reservas con estado `CANCELLED` no cuentan para estas restricciones
+
+Ejemplo:
+
+- si `Jose Ramirez Yañez` reserva a las `05:00:00`, no puede volver a reservar a las `05:40:00`
+- si ese mismo cliente intenta reservar de nuevo a las `09:00:00` o despues, la API si lo permite
+
+- si un cliente ya tiene 4 reservaciones activas en una fecha, la quinta reserva para ese mismo dia sera rechazada
+
 ## Arquitectura General
 
 ### Backend
@@ -229,6 +243,8 @@ Consideraciones:
 
 - el `id` se ignora y se genera en backend
 - el estado final siempre se establece como `PENDING`
+- si el mismo cliente ya tiene una reserva activa, deben haber pasado al menos 4 horas entre ambas
+- si el mismo cliente ya tiene 4 reservas activas en una misma fecha, no se permite crear una quinta para ese dia
 
 Ejemplo de request:
 
@@ -244,6 +260,30 @@ Ejemplo de request:
 Respuesta esperada:
 
 - `201 Created`
+
+Si se incumple la regla de 4 horas, la API responde:
+
+- `409 Conflict`
+
+Ejemplo de error:
+
+```json
+{
+  "message": "Debe pasar al menos 4 horas entre reservaciones activas del mismo cliente."
+}
+```
+
+Si se incumple el maximo diario por cliente, la API responde:
+
+- `409 Conflict`
+
+Ejemplo de error:
+
+```json
+{
+  "message": "No se permiten mas de 4 reservaciones activas del mismo cliente el mismo dia."
+}
+```
 
 ### DELETE /reservas/ {id}
 

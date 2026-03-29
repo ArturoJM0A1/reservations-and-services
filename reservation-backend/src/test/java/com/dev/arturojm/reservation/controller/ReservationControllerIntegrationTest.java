@@ -82,19 +82,81 @@ class ReservationControllerIntegrationTest {
 	}
 
 	@Test
-	void postReservationsReturnsConflictWhenCustomerAlreadyHasReservationAtSameDateAndTime() throws Exception {
+	void postReservationsReturnsConflictWhenCustomerAlreadyHasReservationWithinFourHours() throws Exception {
 		Reservation existingReservation = new Reservation(null, "Luis Gomez", LocalDate.of(2026, 4, 2),
-				LocalTime.of(10, 0), "Diagnostico", ReservationStatus.PENDING);
+				LocalTime.of(5, 0), "Diagnostico", ReservationStatus.PENDING);
 		reservationRepository.save(existingReservation);
 
 		Reservation newReservation = new Reservation(null, "Luis Gomez", LocalDate.of(2026, 4, 2),
-				LocalTime.of(10, 0), "Manicure", ReservationStatus.CONFIRMED);
+				LocalTime.of(5, 40), "Manicure", ReservationStatus.CONFIRMED);
 
 		mockMvc.perform(post("/reservas")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(newReservation)))
 				.andExpect(status().isConflict())
-				.andExpect(jsonPath("$.message").value("Ya tienes una reserevacion a esa hora"));
+				.andExpect(jsonPath("$.message")
+						.value("Debe pasar al menos 4 horas entre reservaciones activas del mismo cliente."));
+	}
+
+	@Test
+	void postReservationsCreatesReservationWhenCustomerWaitedAtLeastFourHours() throws Exception {
+		Reservation existingReservation = new Reservation(null, "Luis Gomez", LocalDate.of(2026, 4, 2),
+				LocalTime.of(5, 0), "Diagnostico", ReservationStatus.PENDING);
+		reservationRepository.save(existingReservation);
+
+		Reservation newReservation = new Reservation(null, "Luis Gomez", LocalDate.of(2026, 4, 2),
+				LocalTime.of(9, 0), "Manicure", ReservationStatus.CONFIRMED);
+
+		mockMvc.perform(post("/reservas")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(newReservation)))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.customerName").value("Luis Gomez"))
+				.andExpect(jsonPath("$.status").value("PENDING"));
+	}
+
+	@Test
+	void postReservationsCreatesReservationWhenCustomerHasThreeActiveReservationsThatDay() throws Exception {
+		LocalDate reservationDate = LocalDate.of(2026, 4, 2);
+		reservationRepository.save(new Reservation(null, "Luis Gomez", reservationDate,
+				LocalTime.of(0, 0), "Servicio 1", ReservationStatus.PENDING));
+		reservationRepository.save(new Reservation(null, "Luis Gomez", reservationDate,
+				LocalTime.of(4, 0), "Servicio 2", ReservationStatus.PENDING));
+		reservationRepository.save(new Reservation(null, "Luis Gomez", reservationDate,
+				LocalTime.of(8, 0), "Servicio 3", ReservationStatus.PENDING));
+
+		Reservation newReservation = new Reservation(null, "Luis Gomez", reservationDate,
+				LocalTime.of(12, 0), "Servicio 4", ReservationStatus.CONFIRMED);
+
+		mockMvc.perform(post("/reservas")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(newReservation)))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.customerName").value("Luis Gomez"))
+				.andExpect(jsonPath("$.status").value("PENDING"));
+	}
+
+	@Test
+	void postReservationsReturnsConflictWhenCustomerAlreadyHasFourActiveReservationsThatDay() throws Exception {
+		LocalDate reservationDate = LocalDate.of(2026, 4, 2);
+		reservationRepository.save(new Reservation(null, "Luis Gomez", reservationDate,
+				LocalTime.of(0, 0), "Servicio 1", ReservationStatus.PENDING));
+		reservationRepository.save(new Reservation(null, "Luis Gomez", reservationDate,
+				LocalTime.of(4, 0), "Servicio 2", ReservationStatus.PENDING));
+		reservationRepository.save(new Reservation(null, "Luis Gomez", reservationDate,
+				LocalTime.of(8, 0), "Servicio 3", ReservationStatus.PENDING));
+		reservationRepository.save(new Reservation(null, "Luis Gomez", reservationDate,
+				LocalTime.of(12, 0), "Servicio 4", ReservationStatus.PENDING));
+
+		Reservation newReservation = new Reservation(null, "Luis Gomez", reservationDate,
+				LocalTime.of(16, 0), "Servicio 5", ReservationStatus.CONFIRMED);
+
+		mockMvc.perform(post("/reservas")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(newReservation)))
+				.andExpect(status().isConflict())
+				.andExpect(jsonPath("$.message")
+						.value("No se permiten mas de 4 reservaciones activas del mismo cliente el mismo dia."));
 	}
 
 	@Test
