@@ -245,7 +245,7 @@ Respuesta esperada:
 
 - `201 Created`
 
-### DELETE /reservas/{id}
+### DELETE /reservas/ {id}
 
 Cancela una reserva existente.
 
@@ -308,7 +308,7 @@ Internamente, el frontend transforma esos valores al payload que espera la API:
 
 ```json
 {
-  "customerName": "Laura Martinez",
+  "customerName": "Karla Martinez Rodriguez",
   "date": "2026-03-28",
   "time": "10:30:00",
   "service": "Diagnostico y mantenimiento preventivo"
@@ -330,7 +330,7 @@ Servicios sugeridos para un negocio de soporte tecnico de computadores:
 Ejecutar la aplicacion:
 
 ```cmd
-mvnw.cmd spring-boot:run
+./mvnw spring-boot:run
 ```
 
 Ejecutar pruebas:
@@ -344,19 +344,19 @@ mvnw.cmd test
 Levantar en desarrollo:
 
 ```cmd
-"D:\Program Files\nodejs\npm.cmd" start
+npm start
 ```
 
-Compilar:
+Compilar para producción:
 
 ```cmd
-"D:\Program Files\nodejs\npm.cmd" run build
+npm run build
 ```
 
 Ejecutar pruebas:
 
 ```cmd
-"D:\Program Files\nodejs\npm.cmd" test
+ test
 ```
 
 ## Verificaciones Realizadas

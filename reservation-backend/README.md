@@ -11,9 +11,7 @@ Este modulo contiene la API REST del sistema de reservas.
 ## Ejecutar
 
 ```cmd
-cd /d "D:\Archivos AJM\Arturo DEV\Proyecto Full Stack Sistema de reservas + IA\reservation-backend arturojm\reservation-backend"
-set JAVA_HOME=D:\Program Files\Eclipse Adoptium\jdk-25.0.2.10-hotspot
-mvnw.cmd spring-boot:run
+./mvnw spring-boot:run
 ```
 
 ## Probar

@@ -256,7 +256,7 @@ export class ReservationsPageComponent implements OnInit, OnDestroy {
   private getErrorMessage(error: unknown, fallbackMessage: string): string {
     if (error instanceof HttpErrorResponse) {
       if (this.isDatabaseConnectionPayload(error.error)) {
-        return 'No se pudo conectar con la base de datos.';
+        return 'No se pudo conectar con la base de datos. :(';
       }
 
       const apiMessage = this.extractApiMessage(error);

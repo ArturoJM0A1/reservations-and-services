@@ -9,18 +9,22 @@ Este modulo contiene el cliente Angular del sistema de reservas.
 - URL del backend: configurada por `environment.apiUrl`
 - pantalla principal: formulario reactivo + tabla de reservas
 
+## Instalar dependencias
+
+```cmd
+npm install
+```
+
 ## Ejecutar
 
 ```cmd
-cd /d "D:\Archivos AJM\Arturo DEV\Proyecto Full Stack Sistema de reservas + IA\reservation-backend arturojm\reservation-frontend"
-"D:\Program Files\nodejs\npm.cmd" install
-"D:\Program Files\nodejs\npm.cmd" start
+npm start
 ```
 
-## Compilar
+## Compilar para producción
 
 ```cmd
-"D:\Program Files\nodejs\npm.cmd" run build
+npm run build
 ```
 
 ## Servicio principal
