@@ -15,6 +15,9 @@ Monorepo con dos aplicaciones principales:
 
 El proyecto permite consultar reservas, crear nuevas reservas desde servicio HTTP y cancelar reservas existentes. En el estado actual del frontend, la vista principal incluye un formulario reactivo para registrar reservas nuevas, una tabla con la agenda actual y la opcion de cancelar reservas existentes.
 
+## Ver video
+[![Ver video](https://img.youtube.com/vi/TWyHqzNirAM/0.jpg)](https://youtu.be/TWyHqzNirAM?si=btzZ8OGuvvOSFkDo)
+
 ## Reglas De Negocio De Reservas
 
 - un mismo cliente debe esperar al menos 4 horas entre una reserva activa y la siguiente
